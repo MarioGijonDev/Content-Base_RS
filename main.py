@@ -1,6 +1,6 @@
 
 # Para ejecutar el codigo:
-# Instalar pandas, numpy y scikit-learn
+# Instalar pandas, numpy
 #   - conda install pandas numpy
 # Asegurarse que se encuentra el directorio rs-movie-cour con los siguientes ficheros_
 #   - movie-tags.csv
