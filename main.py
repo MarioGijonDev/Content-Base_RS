@@ -82,19 +82,8 @@ def srbc():
   # Destructuración del array para obtener los dataframes de los datos obtenidos
   movieTitlesDf, movieTagsDf, usersDf, ratingsDf = arrayDfs
 
-  # Creamos la matriz TF-IDF cono dataframe (es más facil de operar que como matriz dispersa)
-  # tfidf = createTfidf(movieTagsDf)
+  # Creamos la matriz TF-IDF
   tfidf = createTfidf(movieTagsDf)
-
-  # Normalización l2
-    #   (La similitud del coseno entre dos vectores es su producto escalar)
-    #   (divide cada vector por la norma Euclidiana, es decir, la raíz cuadrada de la suma de los cuadrados de los valores de sus elementos.)
-
-  # IMPORTANTE: La biblioteca sklearn ya te da la opción de normalizarlo con l1 o l2 (en este caso, l2)
-
-  # Normalizamos la matriz para que todos tengan modulo 1
-  #   Para evitar que items con muchas etiquetas (Ej. populares) tengan mayor fuerza de ponderación
-  # tfidf = normalizeTfidf(tfidf)
 
   # Obtenemos una lista con los idItem de los items valorados por el usuario
   itemsRated = getRatedItemsByUser(idUser, ratingsDf, movieTitlesDf)
@@ -217,6 +206,7 @@ def getRatedItemsByUser(idUser, ratingsDf, movieTitlesDf):
   return np.array(itemsRated).flatten().tolist()
 
 def createTfidf(movieTagsDf):
+  
   # Reemplazamos los espacos por guiones bajos para evitar separar un mismo tag por tener un espacio
   # Ej: "Tag de ejemplo" -> "Tag_de_ejemplo"
   movieTagsDf['tag'] = movieTagsDf['tag'].apply(lambda x: x.replace(' ', '_'))
@@ -276,10 +266,16 @@ def createTfidf(movieTagsDf):
   # Creamos un dataframe con los valores de las matrices asociados a sus respecitov sidItem y tags 
   tfidf = pd.DataFrame(tfidfMatrix, index=movieTagsDf['idItem'], columns=list(tagFrequency.keys()))
 
+  # Normalizamos la matriz para que todos tengan modulo 1
+  # Para evitar que items con muchas etiquetas (Ej. populares) tengan mayor fuerza de ponderación
+
+  # Normalización l2
+  #   (La similitud del coseno entre dos vectores es su producto escalar)
+  #   (divide cada vector por la norma Euclidiana, es decir, la raíz cuadrada de la suma de los cuadrados de los valores de sus elementos.)
+
   # Calculamos las normas de los vectores de cada item 
   norms = np.linalg.norm(tfidf.values, axis=1, ord=2)
   # Dividimos el vector de cada item por su respectiva norma para obtener el TF-IDF normalizado
-  # de manera que los modulos de los vectores de cada items sea 1
   normalizeTfidf = tfidf.div(norms, axis=0)
 
   # Devolvemos el dataframe de la matriz TF-IDF normalizada
